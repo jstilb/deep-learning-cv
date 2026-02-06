@@ -1,0 +1,19 @@
+# Custom CNN baseline on CIFAR-10
+model_name: custom_cnn
+num_classes: 10
+batch_size: 128
+max_epochs: 50
+learning_rate: 0.001
+weight_decay: 0.0001
+scheduler: onecycle
+dropout: 0.1
+image_size: 32
+num_workers: 4
+val_fraction: 0.1
+early_stopping_patience: 10
+seed: 42
+precision: "32"
+data_dir: ./data
+output_dir: ./experiments/results/custom_cnn
+experiment_name: cifar10-custom-cnn
+mode: fine_tuning

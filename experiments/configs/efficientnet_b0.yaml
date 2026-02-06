@@ -1,0 +1,19 @@
+# EfficientNet-B0 transfer learning on CIFAR-10
+model_name: efficientnet_b0
+num_classes: 10
+batch_size: 64
+max_epochs: 30
+learning_rate: 0.0003
+weight_decay: 0.0001
+scheduler: cosine
+dropout: 0.1
+image_size: 224
+num_workers: 4
+val_fraction: 0.1
+early_stopping_patience: 8
+seed: 42
+precision: "16-mixed"
+data_dir: ./data
+output_dir: ./experiments/results/efficientnet_b0
+experiment_name: cifar10-efficientnet-b0
+mode: fine_tuning

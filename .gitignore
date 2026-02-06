@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ML artifacts
+/experiments/results/*
+!/experiments/results/.gitkeep
+mlruns/
+*.ckpt
+*.pt
+*.pth
+*.onnx
+wandb/
+
+# Data (top-level only, not src/data/)
+/data/
+*.tar.gz
+*.zip
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Misc
+*.log
+.env
+.envrc
