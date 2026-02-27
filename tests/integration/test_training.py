@@ -1,7 +1,7 @@
 """Integration tests for the training pipeline.
 
 These tests use a tiny synthetic dataset to verify the full training loop
-works end-to-end without requiring CIFAR-10 download or GPU.
+works end-to-end without requiring Food-101 download or GPU.
 """
 
 from __future__ import annotations
@@ -118,7 +118,7 @@ class TestTrainingConfig:
     def test_default_config(self) -> None:
         config = TrainingConfig()
         assert config.model_name == "custom_cnn"
-        assert config.num_classes == 10
+        assert config.num_classes == 101  # Food-101 has 101 classes
         assert config.seed == 42
 
     def test_to_dict(self) -> None:

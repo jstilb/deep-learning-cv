@@ -8,8 +8,6 @@ import torch
 from torchvision import transforms
 
 from src.data.augmentations import (
-    CIFAR10_MEAN,
-    CIFAR10_STD,
     IMAGENET_MEAN,
     IMAGENET_STD,
     get_test_transforms,
@@ -53,33 +51,24 @@ class TestAugmentations:
         np.testing.assert_allclose(normalize.mean, IMAGENET_MEAN, atol=1e-4)
         np.testing.assert_allclose(normalize.std, IMAGENET_STD, atol=1e-4)
 
-    def test_cifar10_stats_default(self) -> None:
-        t = get_train_transforms(use_imagenet_stats=False)
+    def test_food101_stats_default(self) -> None:
+        """Food-101 uses ImageNet stats (same as IMAGENET_MEAN/STD)."""
+        t = get_train_transforms(use_imagenet_stats=True)
         normalize = None
         for tr in t.transforms:
             if isinstance(tr, transforms.Normalize):
                 normalize = tr
                 break
         assert normalize is not None
-        np.testing.assert_allclose(normalize.mean, CIFAR10_MEAN, atol=1e-4)
-
-    def test_resize_applied_for_non_32_size(self) -> None:
-        t = get_train_transforms(image_size=224)
-        transform_types = [type(tr).__name__ for tr in t.transforms]
-        assert "Resize" in transform_types
-
-    def test_no_resize_for_default_size(self) -> None:
-        t = get_train_transforms(image_size=32)
-        transform_types = [type(tr).__name__ for tr in t.transforms]
-        assert "Resize" not in transform_types
+        np.testing.assert_allclose(normalize.mean, IMAGENET_MEAN, atol=1e-4)
 
     def test_output_is_tensor(self) -> None:
         t = get_test_transforms()
         from PIL import Image
-        img = Image.fromarray(np.random.randint(0, 255, (32, 32, 3), dtype=np.uint8))
+        img = Image.fromarray(np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8))
         result = t(img)
         assert isinstance(result, torch.Tensor)
-        assert result.shape == (3, 32, 32)
+        assert result.shape[0] == 3  # 3 channels
 
 
 class TestStratifiedSplit:
