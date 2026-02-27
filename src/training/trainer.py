@@ -16,7 +16,7 @@ import torch.nn as nn
 import torchmetrics
 from pytorch_lightning.loggers import MLFlowLogger
 
-from src.data.datasets import CIFAR10DataModule
+from src.data.food101_dataset import Food101DataModule
 from src.models.cnn import CustomCNN
 from src.models.transfer import BackboneType, TransferLearningModel
 from src.training.callbacks import get_checkpoint_callback, get_early_stopping
@@ -173,13 +173,12 @@ def train_model(config: TrainingConfig) -> pl.Trainer:
 
     # Data
     use_imagenet = config.model_name in ("resnet50", "efficientnet_b0")
-    data_module = CIFAR10DataModule(
+    data_module = Food101DataModule(
         data_dir=config.data_dir,
         batch_size=config.batch_size,
         num_workers=config.num_workers,
         val_fraction=config.val_fraction,
-        image_size=config.image_size if use_imagenet else 32,
-        use_imagenet_stats=use_imagenet,
+        image_size=config.image_size,
         seed=config.seed,
     )
 

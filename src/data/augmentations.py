@@ -1,81 +1,75 @@
 """Transform pipelines for training and evaluation.
 
-Provides standardized augmentation strategies for CIFAR-10 and general image
+Provides standardized augmentation strategies for Food-101 and general image
 classification tasks. Training transforms include standard data augmentation
 (random crop, horizontal flip, color jitter) while test transforms only apply
 normalization for deterministic evaluation.
+
+Food-101 uses ImageNet normalization statistics (0.485, 0.456, 0.406) since
+all models use ImageNet-pretrained backbones at 224x224 resolution.
 """
 
 from __future__ import annotations
 
 from torchvision import transforms
 
-# CIFAR-10 channel-wise statistics (precomputed from training set)
-CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
-CIFAR10_STD = (0.2470, 0.2435, 0.2616)
-
-# ImageNet statistics (used for transfer learning with pretrained models)
+# ImageNet statistics — used for all models (Food-101 training with pretrained backbones)
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
 
+# Food-101 normalization statistics (same as ImageNet for consistency)
+FOOD101_MEAN = IMAGENET_MEAN
+FOOD101_STD = IMAGENET_STD
+
 
 def get_train_transforms(
-    image_size: int = 32,
-    use_imagenet_stats: bool = False,
+    image_size: int = 224,
+    use_imagenet_stats: bool = True,
 ) -> transforms.Compose:
     """Build training augmentation pipeline.
 
     Args:
-        image_size: Target spatial dimension (height = width).
-        use_imagenet_stats: If True, normalize with ImageNet statistics
-            (required for pretrained transfer learning models).
+        image_size: Target spatial dimension (height = width). Default 224 for Food-101.
+        use_imagenet_stats: If True, normalize with ImageNet statistics (default).
 
     Returns:
         Composed transform pipeline for training data.
     """
-    mean = IMAGENET_MEAN if use_imagenet_stats else CIFAR10_MEAN
-    std = IMAGENET_STD if use_imagenet_stats else CIFAR10_STD
+    mean = IMAGENET_MEAN
+    std = IMAGENET_STD
 
-    transform_list = []
-
-    if image_size != 32:
-        transform_list.append(transforms.Resize((image_size, image_size)))
-
-    transform_list.extend([
-        transforms.RandomCrop(image_size, padding=4),
+    transform_list = [
+        transforms.RandomResizedCrop(image_size, scale=(0.7, 1.0)),
         transforms.RandomHorizontalFlip(p=0.5),
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+        transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),
         transforms.ToTensor(),
         transforms.Normalize(mean=mean, std=std),
-    ])
+    ]
 
     return transforms.Compose(transform_list)
 
 
 def get_test_transforms(
-    image_size: int = 32,
-    use_imagenet_stats: bool = False,
+    image_size: int = 224,
+    use_imagenet_stats: bool = True,
 ) -> transforms.Compose:
     """Build evaluation transform pipeline (no augmentation).
 
     Args:
-        image_size: Target spatial dimension (height = width).
-        use_imagenet_stats: If True, normalize with ImageNet statistics.
+        image_size: Target spatial dimension (height = width). Default 224 for Food-101.
+        use_imagenet_stats: If True, normalize with ImageNet statistics (default).
 
     Returns:
         Composed transform pipeline for evaluation data.
     """
-    mean = IMAGENET_MEAN if use_imagenet_stats else CIFAR10_MEAN
-    std = IMAGENET_STD if use_imagenet_stats else CIFAR10_STD
+    mean = IMAGENET_MEAN
+    std = IMAGENET_STD
 
-    transform_list = []
-
-    if image_size != 32:
-        transform_list.append(transforms.Resize((image_size, image_size)))
-
-    transform_list.extend([
+    transform_list = [
+        transforms.Resize(int(image_size * 1.14)),
+        transforms.CenterCrop(image_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=mean, std=std),
-    ])
+    ]
 
     return transforms.Compose(transform_list)

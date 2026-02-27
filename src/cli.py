@@ -18,7 +18,7 @@ from rich.table import Table
 
 app = typer.Typer(
     name="dlcv",
-    help="Deep Learning Computer Vision -- CIFAR-10 classification with CNNs and transfer learning.",
+    help="Deep Learning Computer Vision -- Food-101 classification with CNNs, transfer learning, and CLIP zero-shot.",
     add_completion=False,
 )
 console = Console()
@@ -38,7 +38,7 @@ def train(
     seed: int = typer.Option(42, "--seed", help="Random seed."),
     output_dir: str = typer.Option("./experiments/results", "--output-dir", "-o"),
 ) -> None:
-    """Train a model on CIFAR-10."""
+    """Train a model on Food-101."""
     from src.training.config import TrainingConfig
     from src.training.trainer import train_model
 
@@ -80,7 +80,7 @@ def evaluate(
     import torch
     import torch.nn.functional as F
 
-    from src.data.datasets import CIFAR10_CLASSES, CIFAR10DataModule
+    from src.data.food101_dataset import FOOD101_CLASSES, Food101DataModule
     from src.evaluation.analysis import (
         find_confident_errors,
         plot_confusion_matrix,
@@ -90,19 +90,18 @@ def evaluate(
     from src.inference.predict import load_model
     from src.training.config import TrainingConfig
 
-    use_imagenet = model in ("resnet50", "efficientnet_b0")
-    image_size = 224 if use_imagenet else 32
+    # Food-101 requires 224x224 for ImageNet-pretrained backbones
+    image_size = 224
 
     cfg = TrainingConfig(
         model_name=model, image_size=image_size, num_workers=0
     )
     lit_model = load_model(checkpoint, cfg, device="cpu")
 
-    dm = CIFAR10DataModule(
-        batch_size=256,
+    dm = Food101DataModule(
+        batch_size=64,
         num_workers=0,
         image_size=image_size,
-        use_imagenet_stats=use_imagenet,
     )
     dm.prepare_data()
     dm.setup(stage="test")
@@ -123,7 +122,7 @@ def evaluate(
 
     results = compute_metrics(
         y_true, y_pred, y_prob,
-        class_names=list(CIFAR10_CLASSES),
+        class_names=list(FOOD101_CLASSES),
     )
 
     # Print results table
@@ -133,7 +132,7 @@ def evaluate(
     table.add_column("Recall", justify="right")
     table.add_column("F1-Score", justify="right")
 
-    for name in CIFAR10_CLASSES:
+    for name in FOOD101_CLASSES:
         if name in results.per_class_report:
             r = results.per_class_report[name]
             table.add_row(
@@ -150,9 +149,9 @@ def evaluate(
 
     # Save plots
     output = Path(output_dir)
-    plot_confusion_matrix(results, list(CIFAR10_CLASSES), output / "confusion_matrix.png")
+    plot_confusion_matrix(results, list(FOOD101_CLASSES), output / "confusion_matrix.png")
     if results.per_class_roc:
-        plot_roc_curves(results, list(CIFAR10_CLASSES), output / "roc_curves.png")
+        plot_roc_curves(results, list(FOOD101_CLASSES), output / "roc_curves.png")
 
     # Save errors
     errors = find_confident_errors(y_true, y_pred, y_prob)

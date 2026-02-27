@@ -16,7 +16,12 @@ from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
 from torchvision import transforms
 
-from src.data.augmentations import CIFAR10_MEAN, CIFAR10_STD, IMAGENET_MEAN, IMAGENET_STD
+from src.data.augmentations import IMAGENET_MEAN, IMAGENET_STD
+
+# Food-101 uses ImageNet normalization statistics
+# (same as IMAGENET_MEAN/IMAGENET_STD — kept for legacy API compatibility)
+FOOD101_MEAN = IMAGENET_MEAN
+FOOD101_STD = IMAGENET_STD
 
 
 def denormalize(
@@ -61,8 +66,8 @@ def generate_gradcam(
         Tuple of (cam_image, grayscale_cam) where cam_image is the
         overlay visualization and grayscale_cam is the raw heatmap.
     """
-    mean = IMAGENET_MEAN if use_imagenet_stats else CIFAR10_MEAN
-    std = IMAGENET_STD if use_imagenet_stats else CIFAR10_STD
+    mean = IMAGENET_MEAN if use_imagenet_stats else IMAGENET_MEAN
+    std = IMAGENET_STD if use_imagenet_stats else IMAGENET_STD
 
     cam = GradCAM(model=model, target_layers=[target_layer])
 

@@ -15,7 +15,7 @@ from rich.progress import track
 from torchvision import transforms
 
 from src.data.augmentations import get_test_transforms
-from src.data.datasets import CIFAR10_CLASSES
+from src.data.food101_dataset import FOOD101_CLASSES as FOOD101_CLASSES
 from src.training.config import TrainingConfig
 from src.training.trainer import ImageClassifier, build_model
 
@@ -78,11 +78,11 @@ def predict_single(
     confidence, pred_idx = torch.max(probs, dim=1)
 
     return {
-        "class_name": CIFAR10_CLASSES[pred_idx.item()],
+        "class_name": FOOD101_CLASSES[pred_idx.item()],
         "class_index": pred_idx.item(),
         "confidence": confidence.item(),
         "probabilities": {
-            CIFAR10_CLASSES[i]: float(probs[0][i]) for i in range(len(CIFAR10_CLASSES))
+            FOOD101_CLASSES[i]: float(probs[0][i]) for i in range(len(FOOD101_CLASSES))
         },
     }
 

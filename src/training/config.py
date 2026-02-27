@@ -39,14 +39,14 @@ class TrainingConfig:
     """
 
     model_name: str = "custom_cnn"
-    num_classes: int = 10
-    batch_size: int = 128
+    num_classes: int = 101  # Food-101 has 101 classes
+    batch_size: int = 64
     max_epochs: int = 50
     learning_rate: float = 1e-3
     weight_decay: float = 1e-4
     scheduler: str = "onecycle"
     dropout: float = 0.1
-    image_size: int = 32
+    image_size: int = 224  # Food-101 requires 224x224 for ImageNet-pretrained backbones
     num_workers: int = 4
     val_fraction: float = 0.1
     early_stopping_patience: int = 10
@@ -54,7 +54,7 @@ class TrainingConfig:
     precision: str = "32"
     data_dir: str = "./data"
     output_dir: str = "./experiments/results"
-    experiment_name: str = "cifar10-classification"
+    experiment_name: str = "food101-classification"
     mode: str = "fine_tuning"
 
     @classmethod

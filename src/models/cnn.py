@@ -1,4 +1,4 @@
-"""Custom CNN architecture for CIFAR-10 classification.
+"""Custom CNN architecture for Food-101 classification.
 
 A 5-block convolutional network with BatchNorm, ReLU, and Dropout -- designed
 as a strong baseline before comparing against transfer learning approaches.
